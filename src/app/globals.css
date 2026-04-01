@@ -1,0 +1,121 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #3B82F6;
+  --color-secondary: #8B5CF6;
+  --color-accent: #F472B6;
+  --color-bg: #111827;
+  --color-card-bg: #1F2937;
+
+  /* Animations */
+  --animate-fade-up: fade-up 0.8s ease-out forwards;
+  --animate-float: float 3s ease-in-out infinite alternate;
+
+  @keyframes fade-up {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes float {
+    from {
+      transform: translateY(0);
+    }
+
+    to {
+      transform: translateY(-10px);
+    }
+  }
+}
+
+@layer base {
+  body {
+    @apply bg-[var(--color-bg)] text-slate-200 antialiased;
+    font-family: 'Inter', sans-serif;
+  }
+}
+
+@layer components {
+  .hero-text {
+    @apply text-6xl md:text-7xl font-bold;
+    animation: var(--animate-fade-up);
+    background: linear-gradient(90deg, var(--color-primary), var(--color-secondary));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .glass-card {
+    @apply bg-[var(--color-card-bg)] border border-gray-700 rounded-xl shadow-lg p-6;
+    animation: var(--animate-float);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .glass-card:hover {
+    transform: translateY(-12px) scale(1.02);
+    box-shadow: 0 12px 24px rgba(59, 130, 246, 0.3);
+  }
+
+  .btn-primary {
+    @apply text-white px-6 py-2.5 rounded-lg font-semibold shadow-md transition-transform duration-200;
+    background-color: var(--color-primary);
+    animation: var(--animate-float);
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-5px) scale(1.05);
+    background-color: var(--color-secondary);
+  }
+
+  .gradient-text {
+    @apply text-transparent bg-clip-text;
+    background: linear-gradient(90deg, var(--color-primary), var(--color-accent));
+  }
+
+  .nav-link {
+    @apply text-sm font-medium text-slate-400 transition-colors duration-200;
+  }
+
+  .nav-link:hover {
+    color: var(--color-primary);
+  }
+
+  .sidebar-item {
+    @apply flex items-center gap-3 px-4 py-3 rounded-lg text-slate-400 transition-all duration-200;
+  }
+
+  .sidebar-item:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+    color: var(--color-primary);
+  }
+
+  .sidebar-item-active {
+    @apply flex items-center gap-3 px-4 py-3 rounded-lg font-semibold;
+    background-color: #27272A;
+    color: var(--color-primary);
+  }
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-primary);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-secondary);
+}
