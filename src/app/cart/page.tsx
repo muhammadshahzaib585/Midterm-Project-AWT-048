@@ -1,11 +1,45 @@
 'use client';
 
+import { useState } from 'react';
 import { useCart } from '@/context/CartContext';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 
 export default function CartPage() {
   const { cart, removeFromCart, cartTotal, clearCart } = useCart();
+  const [isCheckingOut, setIsCheckingOut] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
+
+  const handleCheckout = () => {
+    setIsCheckingOut(true);
+    // Simulate payment processing
+    setTimeout(() => {
+      setIsCheckingOut(false);
+      setIsSuccess(true);
+      clearCart();
+    }, 2000);
+  };
+
+  if (isSuccess) {
+    return (
+      <div className="min-h-screen bg-[#030712] text-white flex items-center justify-center p-10">
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="bg-white/5 border border-white/10 rounded-[3rem] p-16 text-center max-w-lg shadow-2xl"
+        >
+          <div className="w-24 h-24 bg-emerald-500 rounded-full flex items-center justify-center mx-auto mb-8 shadow-lg shadow-emerald-500/20">
+            <svg className="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7"></path></svg>
+          </div>
+          <h2 className="text-4xl font-black mb-4 uppercase italic tracking-tighter">Payment Successful</h2>
+          <p className="text-slate-400 font-bold mb-10 text-lg">Your campaign has been deployed to the AdFlow Pro network.</p>
+          <Link href="/buyer" className="block w-full py-5 bg-white/5 hover:bg-white/10 text-white font-black rounded-2xl transition border border-white/10 uppercase tracking-widest">
+            Back to Dashboard
+          </Link>
+        </motion.div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#030712] text-white pt-32 pb-20 px-6 md:px-10">
@@ -64,9 +98,22 @@ export default function CartPage() {
             </div>
 
             <div className="pt-6">
-              <button className="w-full py-8 bg-indigo-600 hover:bg-indigo-500 text-white font-black text-xl rounded-[2.5rem] shadow-2xl shadow-indigo-600/30 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-4 group uppercase italic tracking-tighter">
-                Proceed to Checkout
-                <svg className="w-6 h-6 group-hover:translate-x-2 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+              <button 
+                onClick={handleCheckout}
+                disabled={isCheckingOut}
+                className="w-full py-8 bg-indigo-600 hover:bg-indigo-500 text-white font-black text-xl rounded-[2.5rem] shadow-2xl shadow-indigo-600/30 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-4 group uppercase italic tracking-tighter disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isCheckingOut ? (
+                  <>
+                    <svg className="w-6 h-6 animate-spin" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>
+                    Processing...
+                  </>
+                ) : (
+                  <>
+                    Proceed to Checkout
+                    <svg className="w-6 h-6 group-hover:translate-x-2 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                  </>
+                )}
               </button>
               <p className="text-center text-[10px] font-black text-slate-700 uppercase tracking-[0.5em] mt-10">Instant Deployment after Payment Confirmation</p>
             </div>
