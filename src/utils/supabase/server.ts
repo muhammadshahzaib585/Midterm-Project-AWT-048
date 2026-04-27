@@ -17,68 +17,71 @@ export async function createClient() {
           error: null
         })
       },
-      from: (table: string) => ({
-        select: (_columns: string = '*') => ({
-          eq: (_column: string, _value: unknown) => ({
-            order: (_col: string, _options: unknown) => ({
-              range: (_from: number, _to: number) => Promise.resolve({ data: [], error: null }),
+      from: (table: string) => {
+        const chain = {
+          select: (_columns: string = '*') => ({
+            eq: (_column: string, _value: unknown) => ({
+              order: (_col: string, _options: unknown) => ({
+                range: (_from: number, _to: number) => Promise.resolve({ data: [], error: null }),
+                single: () => {
+                  if (table === 'users') {
+                    return Promise.resolve({ data: { role: 'Super Admin' }, error: null });
+                  }
+                  return Promise.resolve({ data: null, error: null });
+                },
+                then: (onfulfilled: any) => Promise.resolve({ data: [], error: null }).then(onfulfilled),
+              }),
               single: () => {
                 if (table === 'users') {
                   return Promise.resolve({ data: { role: 'Super Admin' }, error: null });
                 }
                 return Promise.resolve({ data: null, error: null });
               },
-              // @ts-expect-error - Mock implementation for demo mode
-              then: (onfulfilled) => Promise.resolve({ data: [], error: null }).then(onfulfilled),
+              then: (onfulfilled: any) => Promise.resolve({ data: [], error: null }).then(onfulfilled),
             }),
-            single: () => {
-              if (table === 'users') {
-                return Promise.resolve({ data: { role: 'Super Admin' }, error: null });
+            order: (_col: string, _options: unknown) => ({
+              range: (_from: number, _to: number) => Promise.resolve({ data: [], error: null }),
+              then: (onfulfilled: any) => Promise.resolve({ data: [], error: null }).then(onfulfilled),
+            }),
+            then: (onfulfilled: any) => {
+              if (table === 'packages') {
+                return Promise.resolve({ 
+                  data: [
+                    { id: '1', name: 'Premium Package', duration_days: 30, price: 99, is_active: true },
+                    { id: '2', name: 'Standard Package', duration_days: 15, price: 49, is_active: true }
+                  ], 
+                  error: null 
+                }).then(onfulfilled);
               }
-              return Promise.resolve({ data: null, error: null });
-            },
-            // @ts-expect-error - Mock implementation for demo mode
-            then: (onfulfilled) => Promise.resolve({ data: [], error: null }).then(onfulfilled),
+              return Promise.resolve({ data: [], error: null }).then(onfulfilled);
+            }
           }),
-          order: (_col: string, _options: unknown) => ({
-            range: (_from: number, _to: number) => Promise.resolve({ data: [], error: null }),
-            // @ts-expect-error - Mock implementation for demo mode
-            then: (onfulfilled) => Promise.resolve({ data: [], error: null }).then(onfulfilled),
-          }),
-          insert: (payload: any) => ({
-            select: () => ({
-              single: () => Promise.resolve({ data: { id: 'mock-id', ...payload }, error: null })
-            })
-          }),
+          insert: (payload: any) => {
+            const result = { data: { id: 'mock-' + Math.random().toString(36).substr(2, 9), ...payload }, error: null };
+            return {
+              select: () => ({
+                single: () => Promise.resolve(result),
+                then: (onfulfilled: any) => Promise.resolve(result).then(onfulfilled),
+              }),
+              then: (onfulfilled: any) => Promise.resolve(result).then(onfulfilled),
+            };
+          },
           update: (payload: any) => ({
             eq: () => ({
               select: () => ({
-                single: () => Promise.resolve({ data: { id: 'mock-id', ...payload }, error: null })
-              })
+                single: () => Promise.resolve({ data: { id: 'mock-id', ...payload }, error: null }),
+                then: (onfulfilled: any) => Promise.resolve({ data: { id: 'mock-id', ...payload }, error: null }).then(onfulfilled),
+              }),
+              then: (onfulfilled: any) => Promise.resolve({ data: { id: 'mock-id', ...payload }, error: null }).then(onfulfilled),
             })
           }),
           delete: () => ({
-            eq: () => Promise.resolve({ error: null })
+            eq: () => Promise.resolve({ error: null }),
+            then: (onfulfilled: any) => Promise.resolve({ error: null }).then(onfulfilled),
           }),
-          // @ts-expect-error - Mock implementation for demo mode
-          then: (onfulfilled) => {
-
-
-
-            // For simple selects like .from('packages').select('*')
-            if (table === 'packages') {
-              return Promise.resolve({ 
-                data: [
-                  { id: '1', name: 'Premium Package', duration_days: 30, price: 99, is_active: true },
-                  { id: '2', name: 'Standard Package', duration_days: 15, price: 49, is_active: true }
-                ], 
-                error: null 
-              }).then(onfulfilled);
-            }
-            return Promise.resolve({ data: [], error: null }).then(onfulfilled);
-          }
-        }),
-      }),
+        };
+        return chain;
+      },
     };
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

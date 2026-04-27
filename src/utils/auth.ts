@@ -19,10 +19,10 @@ export async function getUser() {
 
   if (profileError || !profile) {
     // Fallback if profile not found
-    return { ...user, role: 'Client' }; 
+    return { ...user, role: 'Buyer' }; 
   }
 
-  return { ...user, role: profile.role };
+  return { ...user, role: profile.role || 'Buyer' };
 }
 
 export async function requireAuth() {

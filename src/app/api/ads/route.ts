@@ -59,8 +59,8 @@ export async function GET(request: Request) {
     let query = supabase.from('ads').select('*, packages(*)');
 
     // Filter by role or query params
-    if (user.role === 'Client') {
-      // Clients only see their own ads
+    if (user.role === 'Buyer' || user.role === 'buyer' || user.role === 'Client') {
+      // Buyers/Clients only see their own ads
       query = query.eq('user_id', user.id);
     } else {
       // Admins and Moderators

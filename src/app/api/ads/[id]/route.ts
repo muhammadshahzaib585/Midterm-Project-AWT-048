@@ -17,7 +17,7 @@ export async function GET(request: Request, context: { params: Promise<{ id: str
 
     if (error) throw error;
 
-    if (user.role === 'Client' && ad.user_id !== user.id) {
+    if ((user.role === 'Buyer' || user.role === 'buyer' || user.role === 'Client') && ad.user_id !== user.id) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
@@ -43,12 +43,12 @@ export async function PUT(request: Request, context: { params: Promise<{ id: str
 
     if (fetchError || !ad) return NextResponse.json({ error: 'Ad not found' }, { status: 404 });
 
-    if (user.role === 'Client' && ad.user_id !== user.id) {
+    if ((user.role === 'Buyer' || user.role === 'buyer' || user.role === 'Client') && ad.user_id !== user.id) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
     // Usually only allow edits in Draft state, or Admins can force edit
-    if (user.role === 'Client' && ad.status !== 'Draft' && ad.status !== 'Rejected') {
+    if ((user.role === 'Buyer' || user.role === 'buyer' || (user.role === 'Buyer' || user.role === 'buyer' || user.role === 'Client')) && ad.status !== 'Draft' && ad.status !== 'Rejected') {
       return NextResponse.json({ error: 'Cannot edit an ad that is already submitted' }, { status: 400 });
     }
 
@@ -88,11 +88,11 @@ export async function DELETE(request: Request, context: { params: Promise<{ id: 
 
     if (fetchError || !ad) return NextResponse.json({ error: 'Ad not found' }, { status: 404 });
 
-    if (user.role === 'Client' && ad.user_id !== user.id) {
+    if ((user.role === 'Buyer' || user.role === 'buyer' || user.role === 'Client') && ad.user_id !== user.id) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
-    if (user.role === 'Client' && ad.status !== 'Draft') {
+    if ((user.role === 'Buyer' || user.role === 'buyer' || (user.role === 'Buyer' || user.role === 'buyer' || user.role === 'Client')) && ad.status !== 'Draft') {
       return NextResponse.json({ error: 'Can only delete Draft ads' }, { status: 400 });
     }
 
