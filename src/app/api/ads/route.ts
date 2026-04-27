@@ -6,6 +6,13 @@ import { createClient } from '@/utils/supabase/server';
 export async function POST(request: Request) {
   try {
     const user = await requireAuth();
+    
+    // Check if user is allowed to post ads
+    const isAllowed = user.role === 'Seller' || user.role === 'seller' || user.role === 'Admin' || user.role === 'Super Admin';
+    if (!isAllowed) {
+      return NextResponse.json({ error: 'Only Sellers can post ads' }, { status: 403 });
+    }
+
     const body = await request.json();
     
     // Validate request body
