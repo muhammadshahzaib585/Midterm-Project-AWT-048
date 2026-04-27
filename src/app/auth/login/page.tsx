@@ -6,12 +6,12 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 
-type Role = 'client' | 'seller' | 'admin';
+type Role = 'buyer' | 'seller' | 'admin';
 
 const roles = [
   {
-    id: 'client' as Role,
-    label: 'Client',
+    id: 'buyer' as Role,
+    label: 'Buyer',
     icon: (
       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
@@ -27,7 +27,7 @@ const roles = [
       '📊 Track your ad performance',
       '🔔 Receive personalized recommendations',
     ],
-    redirect: '/client/dashboard',
+    redirect: '/buyer',
   },
   {
     id: 'seller' as Role,
@@ -67,7 +67,7 @@ const roles = [
       '📊 Full platform analytics access',
       '⚙️ Configure system-wide settings',
     ],
-    redirect: '/admin/dashboard',
+    redirect: '/admin',
   },
 ];
 
@@ -77,7 +77,7 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [selectedRole, setSelectedRole] = useState<Role>('client');
+  const [selectedRole, setSelectedRole] = useState<Role>('buyer');
   const router = useRouter();
 
   const activeRole = roles.find(r => r.id === selectedRole)!;

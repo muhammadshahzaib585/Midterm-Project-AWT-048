@@ -19,78 +19,80 @@ export default function AdminDashboard() {
 
   return (
     <div className="p-10 max-w-6xl mx-auto">
-      <div className="mb-10">
-        <div className="text-xs font-black text-rose-400 uppercase tracking-widest mb-1">Admin Panel</div>
-        <h1 className="text-3xl font-black text-white">Platform Overview</h1>
-        <p className="text-emerald-100/50 text-sm mt-1">Monitor the full platform — users, ads, payments, and moderation.</p>
+      <div className="mb-12">
+        <div className="text-[10px] font-black text-rose-500 uppercase tracking-[0.4em] mb-3">System Control</div>
+        <h1 className="text-5xl font-black text-white tracking-tighter italic uppercase">Platform <span className="gradient-text">Oversight</span></h1>
+        <p className="text-slate-500 font-bold text-lg mt-2">Monitor system health, manage users, and moderate ad content.</p>
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-12">
         {stats.map((s, i) => (
           <motion.div key={i} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }}
-            className={`${s.bg} border ${s.border} rounded-2xl p-5 text-center`}>
-            <div className="text-2xl mb-1">{s.icon}</div>
-            <div className={`text-3xl font-black ${s.color}`}>{s.value}</div>
-            <div className="text-xs font-bold text-emerald-100/50 uppercase tracking-wider mt-1">{s.label}</div>
+            className="bg-white/[0.02] border border-white/5 rounded-[2.5rem] p-8 text-center group hover:border-rose-500/30 transition-all">
+            <div className="text-3xl mb-4 bg-white/5 w-12 h-12 flex items-center justify-center rounded-2xl mx-auto group-hover:scale-110 transition-transform">{s.icon}</div>
+            <div className={`text-4xl font-black text-white mb-2 tracking-tighter`}>{s.value}</div>
+            <div className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{s.label}</div>
           </motion.div>
         ))}
       </div>
 
       {/* Quick Actions */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-10">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
         {[
-          { title: 'Add New User', desc: 'Create admin, seller, or client accounts.', icon: '👤', href: '/admin/users' },
-          { title: 'Review Ads', desc: 'Approve or reject submitted advertisements.', icon: '🛡️', href: '/admin/ads' },
-          { title: 'View Payments', desc: 'Track all transactions and revenue.', icon: '💳', href: '/admin/payments' },
-          { title: 'Platform Settings', desc: 'Configure system-wide settings.', icon: '⚙️', href: '#' },
+          { title: 'User Admin', desc: 'Manage all accounts.', icon: '👤', href: '/admin/users' },
+          { title: 'Ad Moderation', desc: 'Approve submissions.', icon: '🛡️', href: '/admin/ads' },
+          { title: 'Transaction Log', desc: 'Track payments.', icon: '💳', href: '/admin/payments' },
+          { title: 'System Config', desc: 'Platform settings.', icon: '⚙️', href: '#' },
         ].map((f, i) => (
-          <motion.div key={i} whileHover={{ y: -3 }}
-            className="bg-[#064e3b]/30 border border-emerald-500/20 rounded-2xl p-5">
-            <div className="text-2xl mb-3">{f.icon}</div>
-            <h3 className="font-black text-emerald-50 mb-1 text-sm">{f.title}</h3>
-            <p className="text-xs text-emerald-100/60 mb-3">{f.desc}</p>
-            <Link href={f.href} className="text-xs font-bold text-rose-400 hover:text-rose-300 transition">Go →</Link>
+          <motion.div key={i} whileHover={{ y: -5 }}
+            className="bg-white/[0.03] border border-white/5 rounded-3xl p-8 hover:bg-white/[0.06] transition-all cursor-pointer">
+            <div className="text-3xl mb-4">{f.icon}</div>
+            <h3 className="font-black text-white mb-2 text-sm uppercase tracking-widest">{f.title}</h3>
+            <p className="text-xs text-slate-500 font-medium mb-6">{f.desc}</p>
+            <Link href={f.href} className="text-[10px] font-black text-rose-500 uppercase tracking-widest hover:text-rose-400 transition">Execute →</Link>
           </motion.div>
         ))}
       </div>
 
       {/* Pending Approvals */}
-      <div className="bg-[#064e3b]/20 border border-emerald-500/20 rounded-2xl overflow-hidden">
-        <div className="p-6 border-b border-emerald-900/50 flex items-center justify-between">
-          <h2 className="text-lg font-black text-white">⏳ Pending Approvals</h2>
-          <span className="bg-amber-500/20 text-amber-400 text-xs font-black px-3 py-1 rounded-full border border-amber-500/20">{pendingAds.length} Pending</span>
+      <div className="bg-white/[0.02] border border-white/5 rounded-[3rem] overflow-hidden shadow-2xl">
+        <div className="p-8 border-b border-white/5 flex items-center justify-between bg-white/[0.01]">
+          <h2 className="text-xl font-black text-white uppercase italic tracking-tighter">⏳ Moderation Queue</h2>
+          <span className="text-[10px] font-black text-amber-500 uppercase tracking-widest bg-amber-500/10 px-4 py-2 rounded-full border border-amber-500/20">{pendingAds.length} Pending Approval</span>
         </div>
-        <table className="w-full text-left">
-          <thead className="text-xs uppercase text-emerald-100/50 bg-emerald-900/20">
-            <tr>
-              <th className="p-4">Ad Title</th>
-              <th className="p-4">Submitted By</th>
-              <th className="p-4">Package</th>
-              <th className="p-4">Date</th>
-              <th className="p-4 text-right">Actions</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-emerald-900/30">
-            {pendingAds.map((ad) => (
-              <tr key={ad.id} className="hover:bg-emerald-900/10 transition">
-                <td className="p-4 font-bold text-white text-sm">{ad.title}</td>
-                <td className="p-4 text-xs text-emerald-100/60">{ad.user}</td>
-                <td className="p-4"><span className="text-xs font-bold px-2 py-1 bg-white/10 rounded text-emerald-100">{ad.pkg}</span></td>
-                <td className="p-4 text-xs text-emerald-100/50">{ad.date}</td>
-                <td className="p-4 text-right flex items-center justify-end gap-2">
-                  <button onClick={() => setPendingAds(pendingAds.filter(a => a.id !== ad.id))}
-                    className="text-xs font-bold px-3 py-1.5 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 rounded-lg border border-emerald-500/20 transition">✓ Approve</button>
-                  <button onClick={() => setPendingAds(pendingAds.filter(a => a.id !== ad.id))}
-                    className="text-xs font-bold px-3 py-1.5 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-lg border border-red-500/20 transition">✗ Reject</button>
-                </td>
+        <div className="overflow-x-auto">
+          <table className="w-full text-left border-collapse">
+            <thead className="text-[10px] uppercase text-slate-500 font-black tracking-[0.2em] bg-white/[0.02]">
+              <tr>
+                <th className="p-8">Ad Campaign</th>
+                <th className="p-8">Submitter</th>
+                <th className="p-8">Tier</th>
+                <th className="p-8">Submission Date</th>
+                <th className="p-8 text-right">Actions</th>
               </tr>
-            ))}
-            {pendingAds.length === 0 && (
-              <tr><td colSpan={5} className="p-12 text-center text-emerald-100/50 font-medium">✅ All caught up! No pending ads.</td></tr>
-            )}
-          </tbody>
-        </table>
+            </thead>
+            <tbody className="divide-y divide-white/5">
+              {pendingAds.map((ad) => (
+                <tr key={ad.id} className="hover:bg-white/[0.02] transition-colors group">
+                  <td className="p-8">
+                    <p className="font-black text-white group-hover:text-rose-400 transition">{ad.title}</p>
+                    <p className="text-[10px] text-slate-600 font-bold uppercase tracking-widest mt-1">UUID: {ad.id}</p>
+                  </td>
+                  <td className="p-8 text-sm font-bold text-slate-400">{ad.user}</td>
+                  <td className="p-8"><span className="text-[10px] font-black px-4 py-1.5 bg-white/5 rounded-lg text-white border border-white/10 uppercase tracking-widest">{ad.pkg}</span></td>
+                  <td className="p-8 text-sm font-bold text-slate-500">{ad.date}</td>
+                  <td className="p-8 text-right flex items-center justify-end gap-3">
+                    <button onClick={() => setPendingAds(pendingAds.filter(a => a.id !== ad.id))}
+                      className="px-4 py-2 bg-emerald-500/10 hover:bg-emerald-500 text-emerald-500 hover:text-white font-black text-[10px] uppercase tracking-widest rounded-xl transition-all border border-emerald-500/20">Approve</button>
+                    <button onClick={() => setPendingAds(pendingAds.filter(a => a.id !== ad.id))}
+                      className="px-4 py-2 bg-rose-500/10 hover:bg-rose-500 text-rose-500 hover:text-white font-black text-[10px] uppercase tracking-widest rounded-xl transition-all border border-rose-500/20">Reject</button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );

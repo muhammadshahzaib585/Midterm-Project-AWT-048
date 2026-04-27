@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { Search, Grid, List, Filter, MapPin, Tag } from 'lucide-react';
+import { useCart } from '@/context/CartContext';
 
 export default function ExplorePage() {
   const [view, setView] = useState<'grid' | 'list'>('grid');
@@ -11,6 +12,7 @@ export default function ExplorePage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
   const [selectedCity, setSelectedCity] = useState('');
+  const { addToCart, cartCount } = useCart();
 
   // Dummy data for now. In real app, fetch from /api/ads
   useEffect(() => {
@@ -30,7 +32,7 @@ export default function ExplorePage() {
   return (
     <div className="min-h-screen bg-[#030712] text-white pt-24 pb-20 px-6 md:px-10">
       
-      {/* Navbar Minimal (Normally you would abstract this to a component) */}
+      {/* Navbar Minimal */}
       <nav className="fixed top-0 left-0 w-full z-50 border-b border-white/[0.06] bg-[#030712]/80 backdrop-blur-2xl">
         <div className="max-w-screen-xl mx-auto px-6 md:px-10 h-16 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2.5 group">
@@ -38,7 +40,13 @@ export default function ExplorePage() {
           </Link>
           <div className="flex items-center gap-6">
             <Link href="/" className="text-sm font-semibold text-slate-300 hover:text-white transition">Home</Link>
-            <Link href="/client" className="text-sm font-semibold text-slate-300 hover:text-white transition">Dashboard</Link>
+            <Link href="/buyer" className="text-sm font-semibold text-slate-300 hover:text-white transition">Dashboard</Link>
+            <Link href="/cart" className="relative p-2 bg-white/5 rounded-full hover:bg-white/10 transition">
+              <svg className="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+              {cartCount > 0 && (
+                <span className="absolute -top-1 -right-1 bg-rose-500 text-white text-[10px] font-black w-4 h-4 flex items-center justify-center rounded-full border border-[#030712]">{cartCount}</span>
+              )}
+            </Link>
           </div>
         </div>
       </nav>
@@ -176,9 +184,17 @@ export default function ExplorePage() {
                         </div>
                       </div>
                       
-                      <Link href={`/explore/${ad.id}`} className="w-full block text-center py-2 bg-white/5 hover:bg-white/10 text-white text-sm font-bold rounded-lg transition border border-white/10 group-hover:border-indigo-500/30">
-                        View Details
-                      </Link>
+                      <div className="flex gap-2">
+                        <Link href={`/explore/${ad.id}`} className="flex-1 block text-center py-2 bg-white/5 hover:bg-white/10 text-white text-sm font-bold rounded-lg transition border border-white/10 group-hover:border-indigo-500/30">
+                          Details
+                        </Link>
+                        <button 
+                          onClick={() => addToCart({ id: ad.id, title: ad.title, price: ad.price, thumbnail: ad.ad_media[0].thumbnail_url })}
+                          className="flex-1 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-black rounded-lg transition shadow-lg shadow-indigo-600/20"
+                        >
+                          Buy Now
+                        </button>
+                      </div>
                     </div>
                   </motion.div>
                 ))}
