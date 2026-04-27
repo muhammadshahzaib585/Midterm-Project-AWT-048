@@ -23,7 +23,7 @@ export default async function ClientDashboard() {
   return (
     <div className="p-12 max-w-screen-xl mx-auto animate-reveal-up">
       <div className="mb-12">
-        <p className="text-6xl font-black text-white tracking-tighter mb-4">Hello, <span className="gradient-text italic uppercase">Alex</span></p>
+        <p className="text-6xl font-black text-white tracking-tighter mb-4">Hello, <span className="gradient-text italic uppercase">{user?.email?.split('@')[0] || 'Member'}</span></p>
         <p className="text-slate-500 font-bold text-lg leading-relaxed">Here's what's happening with your listings today.</p>
       </div>
 

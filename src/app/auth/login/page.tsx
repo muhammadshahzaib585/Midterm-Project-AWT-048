@@ -47,7 +47,7 @@ const roles = [
       '📈 View impression & revenue analytics',
       '🎯 Target specific audiences & niches',
     ],
-    redirect: '/client/dashboard',
+    redirect: '/seller',
   },
   {
     id: 'admin' as Role,

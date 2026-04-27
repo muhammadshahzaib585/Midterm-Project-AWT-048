@@ -4,27 +4,62 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { createClient } from '@/utils/supabase/client';
 
-export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+interface DashboardLayoutProps {
+  children: React.ReactNode;
+  userRole?: string;
+  userName?: string;
+  userEmail?: string;
+}
+
+export default function DashboardLayout({ 
+  children, 
+  userRole = 'Client', 
+  userName = 'User',
+  userEmail = ''
+}: DashboardLayoutProps) {
   const pathname = usePathname();
   const router = useRouter();
   const supabase = createClient();
 
-  const primaryNav = [
+  const isAdmin = userRole === 'Admin' || userRole === 'Super Admin';
+  const isSeller = userRole === 'Seller';
+  const isClient = userRole === 'Client';
+
+  const adminNav = [
     { label: 'Platform Stats', icon: 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z', path: '/admin' },
     { label: 'Verify Payments', icon: 'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z', path: '/admin/payments' },
     { label: 'User Management', icon: 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z', path: '/admin/users' },
   ];
 
-  const secondaryNav = [
+  const sellerNav = [
+    { label: 'Seller Dashboard', icon: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6', path: '/seller' },
+    { label: 'My Earnings', icon: 'M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z', path: '/seller/earnings' },
+    { label: 'Post New Ad', icon: 'M12 4v16m8-8H4', path: '/client/ads/create' },
+    { label: 'Analytics', icon: 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z', path: '/seller/analytics' },
+  ];
+
+  const clientNav = [
     { label: 'Client Home', icon: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6', path: '/client/dashboard' },
     { label: 'Post New Ad', icon: 'M12 4v16m8-8H4', path: '/client/ads/create' },
-    { label: 'Settings', icon: 'M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z', path: '/admin/settings' },
+    { label: 'Explore Ads', icon: 'M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z', path: '/explore' },
   ];
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
     router.push('/auth/login');
   };
+
+  // Determine which nav to show
+  let activeNav = clientNav;
+  let sectionTitle = 'Client Access';
+  
+  if (isAdmin) {
+    activeNav = adminNav;
+    sectionTitle = 'Administration';
+  } else if (isSeller) {
+    activeNav = sellerNav;
+    sectionTitle = 'Seller Portal';
+  }
 
   return (
     <div className="min-h-screen bg-[#050505] text-white flex overflow-hidden selection:bg-indigo-500/30">
@@ -38,11 +73,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </div>
 
         <div className="flex-1 space-y-12 overflow-y-auto no-scrollbar">
-            {/* Admin Section */}
+            {/* Active Role Section */}
             <div>
-                <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-600 px-4 mb-6">Administration</p>
+                <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-600 px-4 mb-6">{sectionTitle}</p>
                 <nav className="space-y-2">
-                    {primaryNav.map((item) => (
+                    {activeNav.map((item) => (
                         <Link 
                             key={item.path} 
                             href={item.path} 
@@ -55,20 +90,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 </nav>
             </div>
 
-            {/* General Section */}
+            {/* Common Links */}
             <div>
-                <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-600 px-4 mb-6">General Access</p>
+                <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-600 px-4 mb-6">General</p>
                 <nav className="space-y-2">
-                    {secondaryNav.map((item) => (
-                        <Link 
-                            key={item.path} 
-                            href={item.path} 
-                            className={pathname === item.path ? 'sidebar-item-active' : 'sidebar-item'}
-                        >
-                            <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d={item.icon}></path></svg>
-                            <span className="truncate">{item.label}</span>
-                        </Link>
-                    ))}
+                    <Link href="/packages" className={pathname === '/packages' ? 'sidebar-item-active' : 'sidebar-item'}>
+                        <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
+                        <span className="truncate">Packages</span>
+                    </Link>
                 </nav>
             </div>
         </div>
@@ -84,11 +113,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
             <div className="flex items-center gap-4 px-4 py-8 bg-white/[0.02] rounded-[2rem] border border-white/5 shadow-2xl">
                 <div className="w-12 h-12 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white ring-4 ring-[#050505] shadow-lg">
-                    <span className="font-black">MS</span>
+                    <span className="font-black uppercase">{userName.substring(0, 2)}</span>
                 </div>
                 <div className="flex-1 min-w-0">
-                    <p className="text-sm font-black text-white truncate">M. Shahzaib</p>
-                    <p className="text-[10px] font-bold text-slate-500 truncate uppercase tracking-widest">Super Admin</p>
+                    <p className="text-sm font-black text-white truncate">{userName}</p>
+                    <p className="text-[10px] font-bold text-slate-500 truncate uppercase tracking-widest">{userRole}</p>
                 </div>
                 <div className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_10px_#10b981]"></div>
             </div>
@@ -101,7 +130,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         <header className="px-16 py-8 border-b border-white/5 flex justify-between items-center sticky top-0 bg-[#050505]/90 backdrop-blur-xl z-30">
             <div className="flex items-center gap-4">
                 <p className="text-slate-600 font-bold text-sm tracking-tight capitalize">
-                    {pathname.startsWith('/admin') ? 'Admin' : 'Dashboard'} 
+                    {userRole} 
                     <span className="mx-3 opacity-30 text-white">/</span>
                     <span className="text-indigo-400 font-black">
                         {pathname.split('/').pop()?.replace('-', ' ') || 'Overview'}
@@ -127,7 +156,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                         <div className="absolute top-2 right-2 w-2.5 h-2.5 bg-indigo-500 rounded-full border-2 border-[#050505] animate-pulse"></div>
                     </div>
                     <div className="w-12 h-12 rounded-2xl bg-indigo-600 shadow-xl shadow-indigo-600/30 border-2 border-[#050505] cursor-pointer flex items-center justify-center font-black group transition-transform active:scale-95">
-                        <span className="text-white">MS</span>
+                        <span className="text-white uppercase">{userName.substring(0, 2)}</span>
                     </div>
                 </div>
             </div>
