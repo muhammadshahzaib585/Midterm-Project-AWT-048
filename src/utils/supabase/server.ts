@@ -45,6 +45,21 @@ export async function createClient() {
             // @ts-expect-error - Mock implementation for demo mode
             then: (onfulfilled) => Promise.resolve({ data: [], error: null }).then(onfulfilled),
           }),
+          insert: (payload: any) => ({
+            select: () => ({
+              single: () => Promise.resolve({ data: { id: 'mock-id', ...payload }, error: null })
+            })
+          }),
+          update: (payload: any) => ({
+            eq: () => ({
+              select: () => ({
+                single: () => Promise.resolve({ data: { id: 'mock-id', ...payload }, error: null })
+              })
+            })
+          }),
+          delete: () => ({
+            eq: () => Promise.resolve({ error: null })
+          }),
           // @ts-expect-error - Mock implementation for demo mode
           then: (onfulfilled) => {
 
@@ -66,6 +81,7 @@ export async function createClient() {
       }),
     };
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return mockSupabase as any;
   }
 

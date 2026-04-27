@@ -44,6 +44,7 @@ export async function requireRole(allowedRoles: string[]) {
   return user;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function handleApiError(error: any) {
   console.error('API Error:', error);
   if (error.message === 'Unauthorized') {

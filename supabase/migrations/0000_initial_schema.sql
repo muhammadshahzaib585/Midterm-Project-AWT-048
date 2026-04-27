@@ -130,7 +130,9 @@ create policy "Users can view own profile" on public.users for select
 using ( auth.uid() = id );
 
 create policy "Admins and Moderators can view all users" on public.users for select
-using ( exists (select 1 from public.users where id = auth.uid() and role in ('Admin', 'Super Admin', 'Moderator')) );
+using ( auth.uid() IN (
+  select id from public.users where role in ('Admin', 'Super Admin', 'Moderator')
+) );
 
 -- Packages Table RLS
 -- Anyone can view active packages
@@ -139,10 +141,14 @@ using ( true );
 
 -- Only admins can create/update packages
 create policy "Admins can insert packages" on public.packages for insert
-with check ( exists (select 1 from public.users where id = auth.uid() and role in ('Admin', 'Super Admin')) );
+with check ( auth.uid() IN (
+  select id from public.users where role in ('Admin', 'Super Admin')
+) );
 
 create policy "Admins can update packages" on public.packages for update
-using ( exists (select 1 from public.users where id = auth.uid() and role in ('Admin', 'Super Admin')) );
+using ( auth.uid() IN (
+  select id from public.users where role in ('Admin', 'Super Admin')
+) );
 
 -- Ads Table RLS
 -- Creators can view and manage their own ads
@@ -158,11 +164,15 @@ using ( auth.uid() = user_id );
 
 -- Moderators and Admins can view all ads
 create policy "Staff can view all ads" on public.ads for select
-using ( exists (select 1 from public.users where id = auth.uid() and role in ('Admin', 'Super Admin', 'Moderator')) );
+using ( auth.uid() IN (
+  select id from public.users where role in ('Admin', 'Super Admin', 'Moderator')
+) );
 
 -- Moderators and Admins can update all ads
 create policy "Staff can update all ads" on public.ads for update
-using ( exists (select 1 from public.users where id = auth.uid() and role in ('Admin', 'Super Admin', 'Moderator')) );
+using ( auth.uid() IN (
+  select id from public.users where role in ('Admin', 'Super Admin', 'Moderator')
+) );
 
 -- Anyone can view published ads
 create policy "Anyone can view published ads" on public.ads for select
@@ -174,7 +184,9 @@ create policy "Clients can view and insert own ad media" on public.ad_media for 
 using ( exists (select 1 from public.ads where id = ad_id and user_id = auth.uid()) );
 
 create policy "Staff can manage all ad media" on public.ad_media for all
-using ( exists (select 1 from public.users where id = auth.uid() and role in ('Admin', 'Super Admin', 'Moderator')) );
+using ( auth.uid() IN (
+  select id from public.users where role in ('Admin', 'Super Admin', 'Moderator')
+) );
 
 create policy "Anyone can view published ad media" on public.ad_media for select
 using ( exists (select 1 from public.ads where id = ad_id and status = 'Published'::public.ad_status) );
@@ -187,14 +199,18 @@ create policy "Clients can insert own payments" on public.payments for insert
 with check ( exists (select 1 from public.ads where id = ad_id and user_id = auth.uid()) );
 
 create policy "Admins can view and update all payments" on public.payments for all
-using ( exists (select 1 from public.users where id = auth.uid() and role in ('Admin', 'Super Admin')) );
+using ( auth.uid() IN (
+  select id from public.users where role in ('Admin', 'Super Admin')
+) );
 
 -- Ad Status History RLS
 create policy "Clients can view own ad history" on public.ad_status_history for select
 using ( exists (select 1 from public.ads where id = ad_id and user_id = auth.uid()) );
 
 create policy "Staff can view all history" on public.ad_status_history for select
-using ( exists (select 1 from public.users where id = auth.uid() and role in ('Admin', 'Super Admin', 'Moderator')) );
+using ( auth.uid() IN (
+  select id from public.users where role in ('Admin', 'Super Admin', 'Moderator')
+) );
 
 create policy "System can insert history" on public.ad_status_history for insert
 with check (true); -- usually handled by secure backend APIs

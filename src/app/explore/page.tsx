@@ -1,82 +1,193 @@
-import { getRankedPublishedAds } from '@/utils/ads';
-import Link from 'next/link';
+'use client';
 
-export default async function Explore() {
-  let ads = [];
-  try {
-     ads = await getRankedPublishedAds(50);
-  } catch (error: unknown) {
-     if (error instanceof Error && (error as any).digest?.startsWith('NEXT_REDIRECT')) throw error;
-     console.warn('Could not fetch ads.', error);
-  }
+import { useState, useEffect } from 'react';
+import Link from 'next/link';
+import { motion } from 'framer-motion';
+import { Search, Grid, List, Filter, MapPin, Tag } from 'lucide-react';
+
+export default function ExplorePage() {
+  const [view, setView] = useState<'grid' | 'list'>('grid');
+  const [ads, setAds] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('');
+  const [selectedCity, setSelectedCity] = useState('');
+
+  // Dummy data for now. In real app, fetch from /api/ads
+  useEffect(() => {
+    setAds([
+      { id: '1', title: 'Premium Digital Billboard', description: 'High visibility in downtown area.', price: 500, city: 'Karachi', category: 'Digital', packages: { name: 'Premium' }, ad_media: [{ thumbnail_url: 'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?auto=format&fit=crop&q=80&w=800' }] },
+      { id: '2', title: 'Social Media Blast', description: 'Reach 100k+ users instantly.', price: 150, city: 'Lahore', category: 'Social', packages: { name: 'Standard' }, ad_media: [{ thumbnail_url: 'https://images.unsplash.com/photo-1611162617474-5b21e879e113?auto=format&fit=crop&q=80&w=800' }] },
+      { id: '3', title: 'SEO Optimized Article', description: 'Rank #1 on Google for your niche.', price: 80, city: 'Islamabad', category: 'SEO', packages: { name: 'Basic' }, ad_media: [{ thumbnail_url: 'https://images.unsplash.com/photo-1432821596592-e2c18b78144f?auto=format&fit=crop&q=80&w=800' }] }
+    ] as any);
+  }, []);
+
+  const filteredAds = ads.filter((ad: any) => 
+    ad.title.toLowerCase().includes(searchQuery.toLowerCase()) &&
+    (selectedCategory ? ad.category === selectedCategory : true) &&
+    (selectedCity ? ad.city === selectedCity : true)
+  );
 
   return (
-    <div className="min-h-screen mesh-gradient flex flex-col pt-12">
-      <header className="glass max-w-7xl mx-auto w-[calc(100%-3rem)] rounded-3xl p-8 mb-16 flex flex-col md:flex-row justify-between items-center gap-8 shadow-2xl animate-reveal">
-        <div className="max-w-xl">
-          <Link href="/" className="inline-flex items-center gap-2 mb-4 group transition">
-            <span className="text-indigo-600 text-sm font-black group-hover:-translate-x-1 transition">&lt;</span>
-            <span className="text-slate-400 font-bold text-xs uppercase tracking-widest group-hover:text-slate-600 transition">Back to Home</span>
+    <div className="min-h-screen bg-[#030712] text-white pt-24 pb-20 px-6 md:px-10">
+      
+      {/* Navbar Minimal (Normally you would abstract this to a component) */}
+      <nav className="fixed top-0 left-0 w-full z-50 border-b border-white/[0.06] bg-[#030712]/80 backdrop-blur-2xl">
+        <div className="max-w-screen-xl mx-auto px-6 md:px-10 h-16 flex items-center justify-between">
+          <Link href="/" className="flex items-center gap-2.5 group">
+            <span className="text-lg font-black tracking-tight">AdFlow <span className="text-indigo-400">PRO</span></span>
           </Link>
-          <h1 className="text-4xl font-black text-slate-900 tracking-tight mb-3">Explore <span className="text-indigo-600">Marketplace</span></h1>
-          <p className="text-slate-500 font-bold leading-relaxed">Discover top-tier ad opportunities and premium sponsor listings.</p>
+          <div className="flex items-center gap-6">
+            <Link href="/" className="text-sm font-semibold text-slate-300 hover:text-white transition">Home</Link>
+            <Link href="/client" className="text-sm font-semibold text-slate-300 hover:text-white transition">Dashboard</Link>
+          </div>
         </div>
-        <div className="flex-shrink-0">
-            <Link href="/client/ads/create" className="premium-gradient text-white px-8 py-4 rounded-2xl font-black shadow-xl hover:shadow-indigo-100 transition whitespace-nowrap">
-                POST YOUR LISTING
-            </Link>
-        </div>
-      </header>
+      </nav>
 
-      <main className="max-w-7xl mx-auto px-6 w-full flex-1">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 pb-20">
-          {ads && ads.map((ad: { id: string; title: string; description: string; ad_media?: { thumbnail_url: string }[]; packages?: { name: string } }, i: number) => (
-            <div 
-              key={ad.id} 
-              className="group glass rounded-[2.5rem] overflow-hidden hover:shadow-2xl hover:-translate-y-2 transition duration-500 animate-reveal"
-              style={{ animationDelay: `${i * 100}ms` }}
+      <div className="max-w-screen-xl mx-auto">
+        
+        {/* Header & Search */}
+        <div className="mb-10 flex flex-col md:flex-row gap-6 items-end justify-between">
+          <div className="w-full md:w-1/2">
+            <h1 className="text-4xl font-black mb-4">Explore <span className="text-indigo-400">Listings</span></h1>
+            <div className="relative">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 w-5 h-5" />
+              <input 
+                type="text" 
+                placeholder="Search ads by title..." 
+                className="w-full bg-white/5 border border-white/10 rounded-xl py-3 pl-12 pr-4 focus:border-indigo-500 focus:bg-white/10 transition outline-none text-white placeholder-slate-500"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
+          </div>
+
+          <div className="flex gap-3 w-full md:w-auto">
+            <button 
+              onClick={() => setView('grid')}
+              className={`p-3 rounded-xl border transition ${view === 'grid' ? 'bg-indigo-500/20 border-indigo-500/50 text-indigo-400' : 'bg-white/5 border-white/10 text-slate-400 hover:text-white'}`}
             >
-              <div className="h-64 bg-slate-100 relative overflow-hidden">
-                {ad.ad_media && ad.ad_media[0] ? (
-                  <img src={ad.ad_media[0].thumbnail_url} alt={ad.title} className="object-cover w-full h-full group-hover:scale-110 transition duration-700" />
-                ) : (
-                  <div className="flex items-center justify-center w-full h-full text-slate-300">
-                     <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                  </div>
-                )}
-                {ad.packages?.name.includes('Premium') && (
-                  <div className="absolute top-6 left-6 premium-gradient text-white text-[10px] tracking-widest font-black px-4 py-2 rounded-full shadow-lg">PREMIUM</div>
-                )}
-              </div>
-              <div className="p-10">
-                <div className="flex justify-between items-start mb-4">
-                    <h2 className="text-2xl font-black text-slate-900 group-hover:text-indigo-600 transition leading-tight">{ad.title}</h2>
-                </div>
-                <p className="text-slate-500 mb-8 line-clamp-3 leading-relaxed font-medium">{ad.description}</p>
-                <div className="pt-6 border-t border-slate-100 flex items-center justify-between">
-                  <div className="flex flex-col">
-                    <span className="text-[10px] font-black text-slate-300 uppercase tracking-widest">Type</span>
-                    <span className="text-sm font-black text-slate-900">{ad.packages?.name}</span>
-                  </div>
-                  <Link href={`/explore/${ad.id}`} className="w-12 h-12 glass rounded-2xl flex items-center justify-center text-slate-900 hover:bg-slate-900 hover:text-white transition duration-300">
-                    <span className="text-xl font-light">→</span>
-                  </Link>
-                </div>
-              </div>
-            </div>
-          ))}
-          
-          {(!ads || ads.length === 0) && (
-            <div className="col-span-full py-32 text-center glass rounded-[3rem]">
-              <p className="text-slate-400 font-black italic text-xl">No listings found. Start a new campaign today!</p>
-            </div>
-          )}
+              <Grid className="w-5 h-5" />
+            </button>
+            <button 
+              onClick={() => setView('list')}
+              className={`p-3 rounded-xl border transition ${view === 'list' ? 'bg-indigo-500/20 border-indigo-500/50 text-indigo-400' : 'bg-white/5 border-white/10 text-slate-400 hover:text-white'}`}
+            >
+              <List className="w-5 h-5" />
+            </button>
+          </div>
         </div>
-      </main>
 
-      <footer className="w-full bg-slate-900 text-white py-12 text-center">
-        <p className="opacity-40 text-[10px] font-black uppercase tracking-[0.3em] font-medium">&copy; {new Date().getFullYear()} AdFlow Pro Marketplace</p>
-      </footer>
+        <div className="flex flex-col lg:flex-row gap-8">
+          
+          {/* Sidebar Filters */}
+          <div className="w-full lg:w-1/4">
+            <div className="bg-white/5 border border-white/10 rounded-2xl p-6 sticky top-24">
+              <div className="flex items-center gap-2 mb-6 text-white font-bold text-lg">
+                <Filter className="w-5 h-5 text-indigo-400" /> Filters
+              </div>
+
+              <div className="mb-6">
+                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3 block">Category</label>
+                <div className="space-y-2">
+                  {['', 'Digital', 'Social', 'SEO', 'Print'].map(cat => (
+                    <label key={cat} className="flex items-center gap-3 cursor-pointer group">
+                      <input 
+                        type="radio" 
+                        name="category" 
+                        checked={selectedCategory === cat}
+                        onChange={() => setSelectedCategory(cat)}
+                        className="accent-indigo-500 w-4 h-4 cursor-pointer" 
+                      />
+                      <span className={`text-sm font-medium transition ${selectedCategory === cat ? 'text-white' : 'text-slate-400 group-hover:text-slate-200'}`}>
+                        {cat || 'All Categories'}
+                      </span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              <div className="mb-6">
+                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3 block">City</label>
+                <select 
+                  className="w-full bg-[#0d1117] border border-white/10 rounded-lg py-2 px-3 text-sm text-slate-300 focus:border-indigo-500 outline-none"
+                  value={selectedCity}
+                  onChange={(e) => setSelectedCity(e.target.value)}
+                >
+                  <option value="">All Cities</option>
+                  <option value="Karachi">Karachi</option>
+                  <option value="Lahore">Lahore</option>
+                  <option value="Islamabad">Islamabad</option>
+                </select>
+              </div>
+
+              <button 
+                onClick={() => {setSearchQuery(''); setSelectedCategory(''); setSelectedCity('');}}
+                className="w-full py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-sm font-semibold text-slate-300 transition"
+              >
+                Clear Filters
+              </button>
+            </div>
+          </div>
+
+          {/* Results Area */}
+          <div className="w-full lg:w-3/4">
+            {filteredAds.length === 0 ? (
+              <div className="bg-white/5 border border-white/10 rounded-2xl p-12 text-center">
+                <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Search className="w-8 h-8 text-slate-500" />
+                </div>
+                <h3 className="text-xl font-bold text-white mb-2">No results found</h3>
+                <p className="text-slate-400">Try adjusting your filters or search query.</p>
+              </div>
+            ) : (
+              <div className={view === 'grid' ? "grid grid-cols-1 md:grid-cols-2 gap-6" : "flex flex-col gap-4"}>
+                {filteredAds.map((ad: any, index: number) => (
+                  <motion.div
+                    key={ad.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.1 }}
+                    className={`bg-white/5 border border-white/10 rounded-2xl overflow-hidden group hover:border-indigo-500/50 transition ${view === 'list' ? 'flex flex-row' : 'flex flex-col'}`}
+                  >
+                    <div className={`${view === 'list' ? 'w-1/3 min-h-full' : 'h-48'} bg-[#0d1117] relative overflow-hidden flex-shrink-0`}>
+                      <img
+                        src={ad.ad_media[0].thumbnail_url}
+                        alt={ad.title}
+                        className="object-cover w-full h-full opacity-70 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700"
+                      />
+                      <div className="absolute top-3 left-3 flex gap-2">
+                        <span className="px-2 py-1 bg-indigo-500/80 text-white text-xs font-bold rounded-md backdrop-blur-md shadow-sm">
+                          {ad.packages.name}
+                        </span>
+                      </div>
+                    </div>
+                    
+                    <div className="p-5 flex flex-col justify-between flex-grow">
+                      <div>
+                        <div className="flex justify-between items-start mb-2">
+                          <h3 className="text-lg font-bold text-white group-hover:text-indigo-300 transition-colors">{ad.title}</h3>
+                          <span className="font-black text-indigo-400">${ad.price}</span>
+                        </div>
+                        <p className="text-slate-400 text-sm line-clamp-2 mb-4">{ad.description}</p>
+                        
+                        <div className="flex gap-4 mb-4">
+                          <span className="flex items-center gap-1 text-xs font-semibold text-slate-500"><Tag className="w-3.5 h-3.5" /> {ad.category}</span>
+                          <span className="flex items-center gap-1 text-xs font-semibold text-slate-500"><MapPin className="w-3.5 h-3.5" /> {ad.city}</span>
+                        </div>
+                      </div>
+                      
+                      <Link href={`/explore/${ad.id}`} className="w-full block text-center py-2 bg-white/5 hover:bg-white/10 text-white text-sm font-bold rounded-lg transition border border-white/10 group-hover:border-indigo-500/30">
+                        View Details
+                      </Link>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            )}
+          </div>
+
+        </div>
+      </div>
     </div>
   );
 }

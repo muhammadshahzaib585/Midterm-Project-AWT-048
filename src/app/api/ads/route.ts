@@ -41,7 +41,8 @@ export async function POST(request: Request) {
     return NextResponse.json({ message: 'Ad created successfully', data }, { status: 201 });
   } catch (error: any) {
     if (error.name === 'ZodError') {
-      return NextResponse.json({ error: 'Validation Error', details: error.errors }, { status: 400 });
+      const errorMessage = error.errors[0]?.message || 'Validation Error';
+      return NextResponse.json({ error: errorMessage, details: error.errors }, { status: 400 });
     }
     return handleApiError(error);
   }
