@@ -4,6 +4,72 @@ import { useState } from 'react';
 import { createClient } from '@/utils/supabase/client';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { motion, AnimatePresence } from 'framer-motion';
+
+type Role = 'client' | 'seller' | 'admin';
+
+const roles = [
+  {
+    id: 'client' as Role,
+    label: 'Client',
+    icon: (
+      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+      </svg>
+    ),
+    color: 'from-teal-400 to-emerald-500',
+    borderColor: 'border-teal-500/50',
+    bgColor: 'bg-teal-500/10',
+    textColor: 'text-teal-400',
+    features: [
+      '📋 Browse & explore all ad listings',
+      '💬 Contact publishers directly',
+      '📊 Track your ad performance',
+      '🔔 Receive personalized recommendations',
+    ],
+    redirect: '/client/dashboard',
+  },
+  {
+    id: 'seller' as Role,
+    label: 'Seller',
+    icon: (
+      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z" />
+      </svg>
+    ),
+    color: 'from-amber-400 to-orange-500',
+    borderColor: 'border-amber-500/50',
+    bgColor: 'bg-amber-500/10',
+    textColor: 'text-amber-400',
+    features: [
+      '📢 Post and manage your own ads',
+      '💰 Set pricing for your placements',
+      '📈 View impression & revenue analytics',
+      '🎯 Target specific audiences & niches',
+    ],
+    redirect: '/client/dashboard',
+  },
+  {
+    id: 'admin' as Role,
+    label: 'Admin',
+    icon: (
+      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+      </svg>
+    ),
+    color: 'from-rose-400 to-pink-500',
+    borderColor: 'border-rose-500/50',
+    bgColor: 'bg-rose-500/10',
+    textColor: 'text-rose-400',
+    features: [
+      '👥 Manage all users & permissions',
+      '🛡️ Moderate and approve ad content',
+      '📊 Full platform analytics access',
+      '⚙️ Configure system-wide settings',
+    ],
+    redirect: '/admin/dashboard',
+  },
+];
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -11,7 +77,10 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [selectedRole, setSelectedRole] = useState<Role>('client');
   const router = useRouter();
+
+  const activeRole = roles.find(r => r.id === selectedRole)!;
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -25,34 +94,77 @@ export default function LoginPage() {
       setError(error.message);
       setLoading(false);
     } else {
-      router.push('/client/dashboard');
+      router.push(activeRole.redirect);
       router.refresh();
     }
   };
 
   return (
-    <div className="min-h-screen bg-[#030712] flex items-center justify-center p-6 relative overflow-hidden">
+    <div className="min-h-screen bg-[#022c22] flex items-center justify-center p-6 relative overflow-hidden">
       {/* Ambient orbs */}
-      <div className="absolute top-[-15%] left-[20%] w-[500px] h-[500px] bg-indigo-600/10 rounded-full blur-[120px] pointer-events-none" />
-      <div className="absolute bottom-[-10%] right-[10%] w-[400px] h-[400px] bg-purple-600/8 rounded-full blur-[100px] pointer-events-none" />
+      <div className="absolute top-[-15%] left-[20%] w-[500px] h-[500px] bg-emerald-600/10 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute bottom-[-10%] right-[10%] w-[400px] h-[400px] bg-teal-600/8 rounded-full blur-[100px] pointer-events-none" />
 
-      <div className="w-full max-w-md relative z-10 animate-reveal-up">
+      <div className="w-full max-w-lg relative z-10">
         {/* Logo */}
         <div className="text-center mb-8">
           <Link href="/" className="inline-flex items-center gap-2.5 justify-center group mb-2">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-600/40 group-hover:scale-110 transition-transform">
-              <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3.005 3.005 0 013.75-2.906z" />
-              </svg>
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center shadow-lg shadow-emerald-600/40 group-hover:scale-110 transition-transform">
+              <span className="font-black text-white text-sm">AF</span>
             </div>
-            <span className="text-xl font-black text-white">AdFlow <span className="text-indigo-400">PRO</span></span>
+            <span className="text-xl font-black text-white">AdFlow <span className="text-emerald-400">PRO</span></span>
           </Link>
-          <p className="text-slate-500 text-sm font-medium mt-1">Welcome back. Sign in to continue.</p>
+          <p className="text-emerald-100/50 text-sm font-medium mt-1">Welcome back. Choose your role to continue.</p>
         </div>
 
+        {/* Role Selector */}
+        <div className="grid grid-cols-3 gap-3 mb-6">
+          {roles.map((role) => (
+            <button
+              key={role.id}
+              onClick={() => setSelectedRole(role.id)}
+              className={`flex flex-col items-center gap-2 py-4 px-3 rounded-2xl border-2 transition-all duration-300 ${
+                selectedRole === role.id
+                  ? `${role.borderColor} ${role.bgColor} scale-105 shadow-lg`
+                  : 'border-emerald-900/50 bg-emerald-900/10 hover:border-emerald-500/30 hover:bg-emerald-900/20'
+              }`}
+            >
+              <div className={`p-2 rounded-xl ${selectedRole === role.id ? `bg-gradient-to-br ${role.color} text-white` : 'text-emerald-100/40'}`}>
+                {role.icon}
+              </div>
+              <span className={`text-xs font-black uppercase tracking-widest ${selectedRole === role.id ? role.textColor : 'text-emerald-100/40'}`}>
+                {role.label}
+              </span>
+            </button>
+          ))}
+        </div>
+
+        {/* Role Features Panel */}
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={selectedRole}
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 8 }}
+            transition={{ duration: 0.2 }}
+            className={`mb-5 p-4 rounded-2xl ${activeRole.bgColor} border ${activeRole.borderColor}`}
+          >
+            <p className={`text-xs font-black uppercase tracking-widest mb-3 ${activeRole.textColor}`}>
+              {activeRole.label} Features
+            </p>
+            <div className="grid grid-cols-2 gap-1.5">
+              {activeRole.features.map((feature, i) => (
+                <p key={i} className="text-xs text-emerald-100/70 font-medium">{feature}</p>
+              ))}
+            </div>
+          </motion.div>
+        </AnimatePresence>
+
         {/* Card */}
-        <div className="glass-card rounded-2xl p-8 border border-white/[0.07] shadow-2xl">
-          <h1 className="text-2xl font-black text-white mb-6 tracking-tight">Sign In</h1>
+        <div className="bg-[#064e3b]/30 rounded-2xl p-8 border border-emerald-500/20 shadow-2xl backdrop-blur-md">
+          <h1 className="text-2xl font-black text-white mb-6 tracking-tight">
+            Sign In as <span className={`bg-gradient-to-r ${activeRole.color} bg-clip-text text-transparent`}>{activeRole.label}</span>
+          </h1>
 
           <form onSubmit={handleLogin} className="space-y-5">
             {/* Error */}
@@ -67,13 +179,13 @@ export default function LoginPage() {
 
             {/* Email */}
             <div>
-              <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Email Address</label>
+              <label className="block text-xs font-bold text-emerald-100/60 uppercase tracking-widest mb-2">Email Address</label>
               <input
                 id="login-email"
                 type="email"
                 required
                 autoComplete="email"
-                className="input-field"
+                className="w-full bg-[#022c22]/60 border border-emerald-500/20 rounded-xl px-4 py-3 text-white placeholder-emerald-100/30 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500/50 transition"
                 placeholder="you@example.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -83,8 +195,8 @@ export default function LoginPage() {
             {/* Password */}
             <div>
               <div className="flex items-center justify-between mb-2">
-                <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest">Password</label>
-                <button type="button" className="text-xs text-indigo-400 hover:text-indigo-300 font-semibold transition">Forgot password?</button>
+                <label className="block text-xs font-bold text-emerald-100/60 uppercase tracking-widest">Password</label>
+                <button type="button" className="text-xs text-emerald-400 hover:text-emerald-300 font-semibold transition">Forgot password?</button>
               </div>
               <div className="relative">
                 <input
@@ -92,7 +204,7 @@ export default function LoginPage() {
                   type={showPassword ? 'text' : 'password'}
                   required
                   autoComplete="current-password"
-                  className="input-field pr-12"
+                  className="w-full bg-[#022c22]/60 border border-emerald-500/20 rounded-xl px-4 py-3 pr-12 text-white placeholder-emerald-100/30 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500/50 transition"
                   placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -100,7 +212,7 @@ export default function LoginPage() {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 transition"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-emerald-100/40 hover:text-emerald-300 transition"
                 >
                   {showPassword ? (
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -121,7 +233,7 @@ export default function LoginPage() {
               id="login-submit"
               type="submit"
               disabled={loading}
-              className="btn-primary w-full justify-center py-3.5 rounded-xl text-base mt-2"
+              className={`w-full py-3.5 rounded-xl font-black text-base mt-2 flex items-center justify-center gap-2 transition-all bg-gradient-to-r ${activeRole.color} text-white shadow-lg hover:opacity-90 disabled:opacity-50`}
             >
               {loading ? (
                 <>
@@ -131,22 +243,21 @@ export default function LoginPage() {
                   </svg>
                   Signing in...
                 </>
-              ) : 'Sign In'}
+              ) : `Sign In as ${activeRole.label}`}
             </button>
           </form>
 
-          <div className="mt-6 pt-6 border-t border-white/[0.06] text-center">
-            <p className="text-slate-500 text-sm">
-              Don't have an account?{' '}
-              <Link href="/auth/signup" className="text-indigo-400 hover:text-indigo-300 font-semibold transition">
+          <div className="mt-6 pt-6 border-t border-emerald-900/50 text-center">
+            <p className="text-emerald-100/50 text-sm">
+              Don&apos;t have an account?{' '}
+              <Link href="/auth/signup" className="text-emerald-400 hover:text-emerald-300 font-semibold transition">
                 Create one free
               </Link>
             </p>
           </div>
         </div>
 
-        {/* System ID */}
-        <p className="text-center text-slate-700 text-xs mt-6 font-medium">System ID: 048-AWT-MID · AdFlow Pro Platform</p>
+        <p className="text-center text-emerald-900 text-xs mt-6 font-medium">System ID: 048-AWT-MID · AdFlow Pro Platform</p>
       </div>
     </div>
   );
